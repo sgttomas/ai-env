@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENT.md
 *AI Collaboration Guide for chirality-ai-app Documentation Mirror*
 
 ## What This Directory Contains
@@ -47,11 +47,11 @@ When working on the Python framework, reference these docs to:
 ```
 /chirality-semantic-framework/           (Python - You are here)
   └── lib/chirality-ai-app/             (App docs mirror)
-      └── CLAUDE.md                     (This file)
+      └── AGENT.md                     (This file)
 
 /chirality-ai-app/                      (TypeScript)
   └── lib/chirality-semantic-framework/ (Framework docs mirror)
-      └── CLAUDE.md                     (Explains framework to app developers)
+      └── AGENT.md                     (Explains framework to app developers)
 ```
 
 ## When to Reference These Docs

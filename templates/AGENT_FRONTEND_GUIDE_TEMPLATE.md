@@ -87,7 +87,7 @@ cd lib/[PROJECT_NAME]-backend/
 
 # Execute systematic backend context review
 cat KNOWLEDGE_TRANSFER_MANIFEST.md  # Canonical file list
-cat CLAUDE.md  # Your role in this mirror context
+cat AGENT.md  # Your role in this mirror context
 ```
 
 **Systematic Backend Context Analysis:**

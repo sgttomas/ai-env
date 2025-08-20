@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENT.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with this component of the Chirality Framework.
 

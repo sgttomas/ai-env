@@ -123,7 +123,7 @@ cd lib/[PROJECT_NAME]-frontend/
 
 # Execute systematic frontend context review
 cat KNOWLEDGE_TRANSFER_MANIFEST.md  # Canonical file list
-cat CLAUDE.md  # Your role in this mirror context
+cat AGENT.md  # Your role in this mirror context
 ```
 
 **Systematic Frontend Context Analysis:**
