@@ -44,3 +44,11 @@ git status -- prompts/ workflows/ scripts/
 Tips
 - Prefer linking over duplicating content to reduce drift.
 - Keep canonical sets lean; keep domain‑specific variants here in the mirror.
+
+## Routine Practice (Lightweight)
+
+- Before and after a work session, run: `make status/mirrors` (optionally `SINCE=origin/main`).
+- Paste notable sync outcomes here with a date, e.g.:
+  - [YYYY-MM-DD] Prompts: 2 files updated (mirror → canonical); linked to PR XYZ
+  - [YYYY-MM-DD] Workflows: Added acceptance criteria examples; synced to canonical
+- Use `projects/ai-env/scripts/doc-health.sh <project-dir>` to spot missing AGENT guides/manifests/plans.
