@@ -6,11 +6,12 @@ show_help() {
 mirror-status.sh — summarize mirror changes for prompts/workflows/scripts
 
 Usage:
-  bash mirror-status.sh [--mirror-root PATH] [--since REV] [--dry-run]
+  bash mirror-status.sh [--mirror-root PATH] [--since REV] [--drift-root PATH] [--dry-run]
 
 Options:
   --mirror-root PATH  Path to mirror repo root (defaults to script's repo)
   --since REV         Show name-status diff since a Git ref (e.g., origin/main)
+  --drift-root PATH   Compare file drift vs a canonical root (name + hash)
   --dry-run           Compute only; never modify anything (default behavior)
   --help              Show this help
 
@@ -36,6 +37,7 @@ fi
 MIRROR_ROOT="$DEFAULT_MIRROR_ROOT"
 SINCE_REV=""
 DRY_RUN=1
+DRIFT_ROOT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -45,6 +47,8 @@ while [[ $# -gt 0 ]]; do
       SINCE_REV="$2"; shift 2 ;;
     --dry-run)
       DRY_RUN=1; shift ;;
+    --drift-root)
+      DRIFT_ROOT="$2"; shift 2 ;;
     --help|-h)
       show_help; exit 0 ;;
     *)
@@ -108,5 +112,40 @@ else
   echo "WARN: Mirror README not found at $readme_path" >&2
 fi
 
-exit 0
+# Optional drift check vs DRIFT_ROOT
+if [[ -n "$DRIFT_ROOT" ]]; then
+  if ! git -C "$DRIFT_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+    echo "WARN: --drift-root is not a Git repo: $DRIFT_ROOT" >&2
+  fi
+  echo "\nDrift check vs: $DRIFT_ROOT"
+  for area in "${areas[@]}"; do
+    area_trimmed="${area//[[:space:]]/}"
+    echo "--- Drift: $area_trimmed/"
+    if [[ ! -d "$MIRROR_ROOT/$area_trimmed" ]] && [[ ! -d "$DRIFT_ROOT/$area_trimmed" ]]; then
+      echo "(missing in both)"; continue
+    fi
+    mapfile -t list_m < <(cd "$MIRROR_ROOT" && find "$area_trimmed" -type f -print | LC_ALL=C sort || true)
+    mapfile -t list_c < <(cd "$DRIFT_ROOT" && find "$area_trimmed" -type f -print | LC_ALL=C sort || true)
+    tmp_m=$(mktemp); tmp_c=$(mktemp)
+    printf "%s\n" "${list_m[@]}" > "$tmp_m"
+    printf "%s\n" "${list_c[@]}" > "$tmp_c"
+    only_m=$(comm -23 "$tmp_m" "$tmp_c" | wc -l | tr -d ' ')
+    only_c=$(comm -13 "$tmp_m" "$tmp_c" | wc -l | tr -d ' ')
+    echo "Only in mirror: $only_m"
+    echo "Only in canonical: $only_c"
+    mapfile -t common < <(comm -12 "$tmp_m" "$tmp_c")
+    diff_hash=0
+    for p in "${common[@]}"; do
+      [[ -n "$p" ]] || continue
+      h1=$(shasum -a 1 "$MIRROR_ROOT/$p" | awk '{print $1}')
+      h2=$(shasum -a 1 "$DRIFT_ROOT/$p" | awk '{print $1}')
+      if [[ "$h1" != "$h2" ]]; then
+        diff_hash=$((diff_hash+1))
+      fi
+    done
+    echo "Hash diffs on common files: $diff_hash"
+    rm -f "$tmp_m" "$tmp_c"
+  done
+fi
 
+exit 0
